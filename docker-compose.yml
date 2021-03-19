@@ -1,0 +1,74 @@
+version: '2'
+services:
+
+  # php service
+  php:
+    build:
+      context: ./docker
+      dockerfile: php.Dockerfile
+    container_name: php-${APP_NAME:?err}
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ./app/api:/var/www/api
+      - ./config/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - app-network
+  
+  # nginx service
+  nginx:
+    build:
+      context: ./docker
+      dockerfile: nginx.Dockerfile
+    container_name: nginx-${APP_NAME:?err}
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./app/html:/var/www/html
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - app-network
+  
+  # mysql service
+  db:
+    image: mysql:8
+    container_name: db-${APP_NAME:?err}
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./config/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+  
+  # redis service
+  redis:
+    image: redis:6
+    container_name: redis-${APP_NAME:?err}
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/var/lib/redis
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumens:
+  dbdata:
+    driver: local
