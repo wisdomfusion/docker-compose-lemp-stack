@@ -1,42 +1,51 @@
 version: '2'
+
+networks:
+  netlemp:
+    driver: bridge
+
 services:
+
+  # nginx service
+  nginx:
+    image: nginx:stable-alpine
+    container_name: ${APP_NAME:?err}-nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '80:80'
+    volumes:
+      - ./app/backend:/var/www/backend
+      - ./app/html:/var/www/html
+      - ./config/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./log/nginx/access.log:/var/log/nginx/access.log
+      - ./log/nginx/error.log:/var/log/nginx/error.log
+    depends_on:
+      - php
+    networks:
+      - netlemp
 
   # php service
   php:
     build:
       context: ./docker
       dockerfile: php.Dockerfile
-    container_name: php-${APP_NAME:?err}
+    container_name: ${APP_NAME:?err}-php
     restart: unless-stopped
     tty: true
-    working_dir: /var/www
+    environment:
+      SERVICE_NAME: php
+      SERVICE_TAGS: dev
     volumes:
-      - ./app/api:/var/www/api
-      - ./config/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./app/backend:/var/www/backend
+      - ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - app-network
-  
-  # nginx service
-  nginx:
-    build:
-      context: ./docker
-      dockerfile: nginx.Dockerfile
-    container_name: nginx-${APP_NAME:?err}
-    restart: unless-stopped
-    tty: true
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./app/html:/var/www/html
-      - ./config/nginx/conf.d:/etc/nginx/conf.d
-    networks:
-      - app-network
+      - netlemp
   
   # mysql service
-  db:
+  mysql:
     image: mysql:8
-    container_name: db-${APP_NAME:?err}
+    container_name: ${APP_NAME:?err}-mysql
     restart: unless-stopped
     tty: true
     ports:
@@ -44,31 +53,45 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
-      SERVICE_TAGS: dev
       SERVICE_NAME: mysql
+      SERVICE_TAGS: dev
     volumes:
-      - dbdata:/var/lib/mysql
+      - ./data/mysql-files:/var/lib/mysql-files
       - ./config/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
-      - app-network
-  
+      - netlemp
+
   # redis service
   redis:
-    image: redis:6
-    container_name: redis-${APP_NAME:?err}
+    image: redis:6-alpine
+    container_name: ${APP_NAME:?err}-redis
     restart: unless-stopped
     tty: true
     ports:
       - '6379:6379'
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?err}
+      SERVICE_NAME: redis
+      SERVICE_TAGS: dev
     volumes:
-      - redisdata:/var/lib/redis
+      - ./data/redis:/data
     networks:
-      - app-network
+      - netlemp
 
-networks:
-  app-network:
-    driver: bridge
-
-volumens:
-  dbdata:
-    driver: local
+  # phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin:fpm-alpine
+    container_name: ${APP_NAME:?err}-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - '8183:80'
+    environment:
+      PMA_ARBITRARY: 1
+      MYSQL_USERNAME: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+      PMA_HOST: mysql
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - netlemp
