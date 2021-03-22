@@ -1,7 +1,7 @@
 version: '2'
 
 networks:
-  netlemp:
+  lempnet:
     driver: bridge
 
 services:
@@ -15,15 +15,15 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./app/backend:/var/www/backend
       - ./app/html:/var/www/html
+      - ./app/backend:/var/www/backend
       - ./config/nginx/conf.d/:/etc/nginx/conf.d/
       - ./log/nginx/access.log:/var/log/nginx/access.log
       - ./log/nginx/error.log:/var/log/nginx/error.log
     depends_on:
       - php
     networks:
-      - netlemp
+      - lempnet
 
   # php service
   php:
@@ -40,7 +40,7 @@ services:
       - ./app/backend:/var/www/backend
       - ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - netlemp
+      - lempnet
   
   # mysql service
   mysql:
@@ -59,7 +59,7 @@ services:
       - ./data/mysql-files:/var/lib/mysql-files
       - ./config/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
-      - netlemp
+      - lempnet
 
   # redis service
   redis:
@@ -76,7 +76,7 @@ services:
     volumes:
       - ./data/redis:/data
     networks:
-      - netlemp
+      - lempnet
 
   # phpmyadmin
   phpmyadmin:
@@ -94,4 +94,4 @@ services:
       - php
       - mysql
     networks:
-      - netlemp
+      - lempnet

@@ -3,7 +3,6 @@ FROM php:7.4-fpm
 WORKDIR /var/www/backend
 
 RUN apt-get update && apt-get -y install \
-    build-essential \
     libpng-dev \
     libmcrypt-dev \
     libjpeg62-turbo-dev \
@@ -13,12 +12,12 @@ RUN apt-get update && apt-get -y install \
     libonig-dev \
     libzip-dev \
     locales \
-    zip \
     jpegoptim \
     optipng \
     pngquant \
     gifsicle \
     vim \
+    zip \
     unzip \
     git \
     curl
@@ -26,14 +25,12 @@ RUN apt-get update && apt-get -y install \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install pdo_mysql mysqli mbstring zip exif pcntl
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install -j$(nproc) gd
+RUN pecl install -o -f redis && docker-php-ext-enable redis
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www && mkdir -p /var/www/backend
-
-COPY --chown=www:www . /var/www/backend
+RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www && chown -R www:www /var/www/backend
 
 USER www
 
