@@ -24,11 +24,17 @@ docker ps
 
 ## For PHP/Laravel Projects
 
-We can use `docker-compose exec` to set the application key for the Laravel application. The docker-compose exec command allows you to run specific commands in containers.
+We can use `docker-compose exec` to set the application key for the Laravel application. The `docker-compose exec` command allows you to run specific commands in containers.
 
 ```sh
 docker-compose exec php php artisan key:generate
 docker-compose exec php php artisan config:cache
+```
+
+PHP dependency manager `composer` is installed in php container, we can can run `docker-compose exec` command to access the container, and perform dependency management using `composer`.
+
+```sh
+docker-compose exec php bash
 ```
 
 ## MySQL Administration
