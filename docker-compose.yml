@@ -75,7 +75,7 @@ services:
 
   # phpmyadmin
   phpmyadmin:
-    image: phpmyadmin:fpm-alpine
+    image: phpmyadmin/phpmyadmin
     container_name: ${APP_NAME:?err}-phpmyadmin
     restart: unless-stopped
     ports:
@@ -84,9 +84,7 @@ services:
       PMA_ARBITRARY: 1
       MYSQL_USERNAME: root
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
-      PMA_HOST: mysql
     depends_on:
-      - php
       - mysql
     networks:
       - lempnet
