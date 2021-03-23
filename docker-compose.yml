@@ -27,14 +27,12 @@ services:
   # php service
   php:
     build:
-      context: ./docker
-      dockerfile: php.Dockerfile
+      context: .
+      dockerfile: ./docker/php.Dockerfile
+    image: wf/php
     container_name: ${APP_NAME:?err}-php
     restart: unless-stopped
     tty: true
-    environment:
-      SERVICE_NAME: php
-      SERVICE_TAGS: dev
     volumes:
       - ./app/backend:/var/www/backend
       - ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
@@ -51,9 +49,9 @@ services:
       - '3306:3306'
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
+      MYSQL_USER: ${MYSQL_USER:?err}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?err}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
-      SERVICE_NAME: mysql
-      SERVICE_TAGS: dev
     volumes:
       - ./data/mysql-files:/var/lib/mysql-files
       - ./config/mysql/my.cnf:/etc/mysql/my.cnf
@@ -70,8 +68,6 @@ services:
       - '6379:6379'
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?err}
-      SERVICE_NAME: redis
-      SERVICE_TAGS: dev
     volumes:
       - ./data/redis:/data
     networks:

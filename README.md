@@ -6,6 +6,15 @@ Docker Compose LEMP Stack, with PHP 7.4, MySQL 8.0, and Redis 6, for PHP applica
 
 With this suite of docker orchestration files, I put a prefix before containers' name, `myapp` be default. In this way, all of the containers built with the compose file would come up this a `myapp-` in its title, for example, `myapp-php` and `myapp-nginx`, etc.
 
+Copy `.env.example` to `.env`, and change environment keys in `.env` file:
+
+- APP_NAME
+- MYSQL_DATABASE
+- MYSQL_USER
+- MYSQL_PASSWORD
+- MYSQL_ROOT_PASSWORD
+- REDIS_PASSWORD
+
 ## Start Up
 
 With all of your services defined in your `docker-compose` file, you just need to issue a single command to start all of the containers, create the volumes, and set up and connect the networks:
@@ -37,27 +46,7 @@ docker-compose exec php php artisan config:cache
 docker-compose exec php bash
 ```
 
-## MySQL Administration
-
-The default MySQL installation only creates the **root** administrative account, which has unlimited privileges on the database server. It's better to avoid using the **root** administrative account when interacting with the database. Instead, let's create a dedicated database user for our application's Laravel database.
-
-To create a new user, execute an interactive bash shell on the db container with `docker-compose exec`:
-
-```sh
-docker-compose exec mysql bash
-```
-
-Inside the container, log into the MySQL **root** administrative account:
-
-    root@3abd08c699aa:/# mysql -u root -p
-
-Next, create the user account that will be allowed to access this database. Our username will be `laraveldbuser`, though you can replace this with another name if you'd prefer. Just be sure that your username and password here match the details you set in your `.env` file:
-
-```sql
-mysql> GRANT ALL ON laravel.* TO 'laraveldbuser'@'%' IDENTIFIED BY 'laravel_db_password';
-mysql> FLUSH PRIVILEGES;
-mysql> EXIT;
-```
+Besides, php cotainer also includes some useful tools, such as `vim`, `git`, `wget`, `curl`.
 
 ## Clear Log Files
 

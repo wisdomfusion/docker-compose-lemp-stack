@@ -30,9 +30,5 @@ RUN pecl install -o -f redis && docker-php-ext-enable redis
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www && chown -R www:www /var/www/backend
-
-USER www
-
 EXPOSE 9000
 CMD ["php-fpm"]

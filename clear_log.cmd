@@ -1,2 +1,2 @@
-﻿break > .\log\nginx\access.log
-break > .\log\nginx\error.log
+﻿break>.\log\nginx\access.log
+break>.\log\nginx\error.log
