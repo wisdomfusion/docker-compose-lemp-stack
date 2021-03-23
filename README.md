@@ -4,7 +4,7 @@ Docker Compose LEMP Stack, with PHP 7.4, MySQL 8.0, and Redis 6, for PHP applica
 
 ## Before Usage
 
-With this suite of docker orchestration files, I put a prefix before containers' name, `myapp` be default. In this way, all of the containers created from the compose file would come up this a `myapp-` in its title, for example, `myapp-php` and `myapp-nginx`, etc.
+With this suite of docker orchestration files, I put a prefix before containers' name, `myapp` be default. In this way, all of the containers built with the compose file would come up this a `myapp-` in its title, for example, `myapp-php` and `myapp-nginx`, etc.
 
 ## Start Up
 
@@ -24,14 +24,14 @@ docker ps
 
 ## For PHP/Laravel Projects
 
-We can use `docker-compose exec` to set the application key for the Laravel application. The `docker-compose exec` command allows you to run specific commands in containers.
+You can use `docker-compose exec` to set the application key for the Laravel application, or other artison command.
 
 ```sh
 docker-compose exec php php artisan key:generate
 docker-compose exec php php artisan config:cache
 ```
 
-PHP dependency manager `composer` is installed in php container, we can can run `docker-compose exec` command to access the container, and perform dependency management using `composer`.
+`composer`, PHP dependency manager, is installed in php container, you can run `docker-compose exec` command to access php container, and perform dependency management using `composer` command.
 
 ```sh
 docker-compose exec php bash
@@ -39,9 +39,9 @@ docker-compose exec php bash
 
 ## MySQL Administration
 
-The default MySQL installation only creates the root administrative account, which has unlimited privileges on the database server. In general, it's better to avoid using the root administrative account when interacting with the database. Instead, let's create a dedicated database user for our application's Laravel database.
+The default MySQL installation only creates the **root** administrative account, which has unlimited privileges on the database server. It's better to avoid using the **root** administrative account when interacting with the database. Instead, let's create a dedicated database user for our application's Laravel database.
 
-To create a new user, execute an interactive bash shell on the db container with docker-compose exec:
+To create a new user, execute an interactive bash shell on the db container with `docker-compose exec`:
 
 ```sh
 docker-compose exec mysql bash
@@ -51,17 +51,17 @@ Inside the container, log into the MySQL **root** administrative account:
 
     root@3abd08c699aa:/# mysql -u root -p
 
-Next, create the user account that will be allowed to access this database. Our username will be `laraveluser`, though you can replace this with another name if you'd prefer. Just be sure that your username and password here match the details you set in your .env file:
+Next, create the user account that will be allowed to access this database. Our username will be `laraveldbuser`, though you can replace this with another name if you'd prefer. Just be sure that your username and password here match the details you set in your `.env` file:
 
 ```sql
-> GRANT ALL ON laravel.* TO 'laraveluser'@'%' IDENTIFIED BY 'your_laravel_db_password';
-> FLUSH PRIVILEGES;
-> EXIT;
+mysql> GRANT ALL ON laravel.* TO 'laraveldbuser'@'%' IDENTIFIED BY 'laravel_db_password';
+mysql> FLUSH PRIVILEGES;
+mysql> EXIT;
 ```
 
 ## Clear Log Files
 
-Before we push changes to github, clear contents of log files first.
+Before we push changes to Github, clear contents of log files first.
 
 On Windows, double click [clear_log.cmd](./clear_log.cmd) and execute it.
 
