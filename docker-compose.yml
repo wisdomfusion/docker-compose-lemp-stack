@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - '80:80'
+      - 80:80
     volumes:
       - ./app/html:/var/www/html
       - ./config/nginx/conf.d/:/etc/nginx/conf.d/
@@ -46,7 +46,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - '3306:3306'
+      - 3306:3306
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?err}
       MYSQL_USER: ${MYSQL_USER:?err}
@@ -65,7 +65,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - '6379:6379'
+      - 6379:6379
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?err}
     volumes:
@@ -79,7 +79,7 @@ services:
     container_name: ${APP_NAME:?err}-phpmyadmin
     restart: unless-stopped
     ports:
-      - '8183:80'
+      - 8183:80
     environment:
       PMA_ARBITRARY: 1
       MYSQL_USERNAME: root
